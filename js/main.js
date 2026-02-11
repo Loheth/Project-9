@@ -66,6 +66,8 @@ Main.prototype = {
 
 	update: function() {
 
+		this.syncPlayerGlow();
+
 		this.game.physics.arcade.collide(this.player, this.floor);
 		this.game.physics.arcade.collide(this.player, this.boxes, this.gameOver, null, this);
 
@@ -158,10 +160,46 @@ Main.prototype = {
 
 	createPlayer: function () {
 
-		this.player = this.game.add.sprite(this.game.world.width/5, this.game.world.height -
-			(this.tileHeight*2), 'player');
+		var playerX = this.game.world.width / 5;
+		var playerY = this.game.world.height - (this.tileHeight * 2);
+
+		// Cyber neon: inner magenta glow + outer cyan outline
+		var innerOffset = 1;
+		var outerOffset = 2;
+		var innerOffsets = [
+			[innerOffset, 0], [-innerOffset, 0], [0, innerOffset], [0, -innerOffset],
+			[innerOffset, innerOffset], [-innerOffset, innerOffset],
+			[innerOffset, -innerOffset], [-innerOffset, -innerOffset]
+		];
+		var outerOffsets = [
+			[outerOffset, 0], [-outerOffset, 0], [0, outerOffset], [0, -outerOffset],
+			[outerOffset, outerOffset], [-outerOffset, outerOffset],
+			[outerOffset, -outerOffset], [-outerOffset, -outerOffset]
+		];
+		this.playerOutlineSprites = [];
+		// Outer cyan glow (drawn first, so it sits behind)
+		for (var j = 0; j < outerOffsets.length; j++) {
+			var s2 = this.game.add.sprite(playerX + outerOffsets[j][0], playerY + outerOffsets[j][1], 'player');
+			s2.anchor.setTo(0.5, 1.0);
+			s2.scale.setTo(4, 4);
+			s2.tint = 0x00E5FF; // cyber neon cyan
+			s2.alpha = 1;
+			this.playerOutlineSprites.push({ sprite: s2, dx: outerOffsets[j][0], dy: outerOffsets[j][1] });
+		}
+		// Inner magenta glow
+		for (var i = 0; i < innerOffsets.length; i++) {
+			var s = this.game.add.sprite(playerX + innerOffsets[i][0], playerY + innerOffsets[i][1], 'player');
+			s.anchor.setTo(0.5, 1.0);
+			s.scale.setTo(4, 4);
+			s.tint = 0xFF00FF; // cyber magenta
+			s.alpha = 0.7;
+			this.playerOutlineSprites.push({ sprite: s, dx: innerOffsets[i][0], dy: innerOffsets[i][1] });
+		}
+
+		this.player = this.game.add.sprite(playerX, playerY, 'player');
 		this.player.scale.setTo(4, 4);
 		this.player.anchor.setTo(0.5, 1.0);
+		this.player.tint = 0x88CCFF; // cyber blue-silver tint
 		this.game.physics.arcade.enable(this.player);
 		this.player.body.gravity.y = 2200;
 		this.player.body.collideWorldBounds = true;
@@ -169,7 +207,17 @@ Main.prototype = {
 		this.player.body.drag.x = 150;
 		var walk = this.player.animations.add('walk');
 		this.player.animations.play('walk', 20, true);
+		this.game.world.bringToTop(this.player);
+	},
 
+	syncPlayerGlow: function () {
+		if (!this.playerOutlineSprites) return;
+		for (var i = 0; i < this.playerOutlineSprites.length; i++) {
+			var o = this.playerOutlineSprites[i];
+			o.sprite.x = this.player.x + o.dx;
+			o.sprite.y = this.player.y + o.dy;
+			o.sprite.frame = this.player.frame;
+		}
 	},
 
 	createScore: function () {
