@@ -14,10 +14,19 @@ Main.prototype = {
 
 		this.tileWidth = this.game.cache.getImage('tile').width;
 		this.tileHeight = this.game.cache.getImage('tile').height;
-		this.boxHeight = this.game.cache.getImage('box').height;
+		this.boxScale = 0.28;
+		this.boxHeight = this.game.cache.getImage('box').height * this.boxScale;
 
 		this.game.stage.backgroundColor = '479cde';
 
+		this.bg = this.game.add.sprite(0, 0, 'bg');
+		this.bg.width = this.game.world.width;
+		this.bg.height = this.game.world.height;
+
+		this.bgOverlay = this.game.add.graphics(0, 0);
+		this.bgOverlay.beginFill(0x000000, 0.45);
+		this.bgOverlay.drawRect(0, 0, this.game.world.width, this.game.world.height);
+		this.bgOverlay.endFill();
 
 		this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -28,6 +37,12 @@ Main.prototype = {
 		this.boxes = this.game.add.group();
 		this.boxes.enableBody = true;
 		this.boxes.createMultiple(20, 'box');
+		var boxW = this.game.cache.getImage('box').width * this.boxScale;
+		var boxH = this.game.cache.getImage('box').height * this.boxScale;
+		this.boxes.forEach(function(b) {
+			b.scale.setTo(this.boxScale, this.boxScale);
+			b.body.setSize(boxW, boxH);
+		}, this);
 		this.game.world.bringToTop(this.floor);
 
 		this.jumping = false;
