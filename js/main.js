@@ -174,37 +174,25 @@ Main.prototype = {
 
 	createScore: function () {
 
-		var scoreFont = "70px Arial";
+		var scoreFont = "70px 'Press Start 2P'";
+		var neonCyan = "#00E5FF";
+		var shadowBlur = 32;
 
-		this.scoreLabel = this.game.add.text(this.game.world.centerX, 70, "0", { font: scoreFont, fill: "#fff" });
+		this.scoreLabel = this.game.add.text(this.game.world.centerX, 70, "0", {
+			font: scoreFont,
+			fill: neonCyan,
+			align: "center"
+		});
 		this.scoreLabel.anchor.setTo(0.5, 0.5);
-		this.scoreLabel.align = 'center';
+		this.scoreLabel.setShadow(0, 0, neonCyan, shadowBlur);
 		this.game.world.bringToTop(this.scoreLabel);
-
-		this.highScore = this.game.add.text(this.game.world.centerX * 1.6, 70, "0", { font: scoreFont, fill: "#fff" });
-		this.highScore.anchor.setTo(0.5, 0.5);
-		this.highScore.align = 'right';
-		this.game.world.bringToTop(this.highScore);
-
-		if (window.localStorage.getItem('HighScore') == null) {
-			this.highScore.setText(0);
-			window.localStorage.setItem('HighScore', 0);
-		}
-		else {
-			this.highScore.setText(window.localStorage.getItem('HighScore'));
-		}
 	},
 
 	incrementScore: function () {
 
-
 		score += 1;
 		this.scoreLabel.setText(score);
 		this.game.world.bringToTop(this.scoreLabel);
-		this.highScore.setText("HS: " + window.localStorage.getItem('HighScore'));
-		this.game.world.bringToTop(this.highScore);
-
-
 	},
 
 	gameOver: function(){
