@@ -12,8 +12,11 @@ Main.prototype = {
 		this.rate = 1500;
 		score = 0;
 
-		this.tileWidth = this.game.cache.getImage('tile').width;
-		this.tileHeight = this.game.cache.getImage('tile').height;
+		var tileImg = this.game.cache.getImage('tile');
+		this.tileWidth = 64;
+		this.tileHeight = 64;
+		this.tileScaleX = this.tileWidth / tileImg.width;
+		this.tileScaleY = this.tileHeight / tileImg.height;
 		this.boxScale = 0.28;
 		this.boxHeight = this.game.cache.getImage('box').height * this.boxScale;
 
@@ -33,6 +36,10 @@ Main.prototype = {
 		this.floor = this.game.add.group();
 		this.floor.enableBody = true;
 		this.floor.createMultiple(Math.ceil(this.game.world.width / this.tileWidth), 'tile');
+		this.floor.forEach(function(t) {
+			t.scale.setTo(this.tileScaleX, this.tileScaleY);
+			t.body.setSize(this.tileWidth, this.tileHeight);
+		}, this);
 
 		this.boxes = this.game.add.group();
 		this.boxes.enableBody = true;
